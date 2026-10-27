@@ -301,3 +301,5 @@ moc_predefs.h
 # shiboken-generated files
 Engine/Qt5
 Gui/Qt5
+# CMake preset / CLion build directories
+/cmake-build-*/

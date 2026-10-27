@@ -1,0 +1,50 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "qt6-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "cacheVariables": {
+        "NATRON_QT6": "ON",
+        "NATRON_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "macos-qt6-debug",
+      "displayName": "macOS Qt6 Debug (Homebrew)",
+      "inherits": "qt6-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "CMAKE_PREFIX_PATH": "/opt/homebrew" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" }
+    },
+    {
+      "name": "macos-qt6-release",
+      "displayName": "macOS Qt6 Release (Homebrew)",
+      "inherits": "qt6-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "CMAKE_PREFIX_PATH": "/opt/homebrew" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" }
+    },
+    {
+      "name": "linux-qt6-debug",
+      "displayName": "Linux Qt6 Debug",
+      "inherits": "qt6-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    },
+    {
+      "name": "linux-qt6-release",
+      "displayName": "Linux Qt6 Release",
+      "inherits": "qt6-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "macos-qt6-debug", "configurePreset": "macos-qt6-debug" },
+    { "name": "macos-qt6-release", "configurePreset": "macos-qt6-release" },
+    { "name": "linux-qt6-debug", "configurePreset": "linux-qt6-debug" },
+    { "name": "linux-qt6-release", "configurePreset": "linux-qt6-release" }
+  ]
+}
