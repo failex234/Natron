@@ -48,6 +48,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QDir>
+#include <QRegularExpression>
 #include <QDirIterator>
 #include <QTemporaryFile>
 #include <QFileInfo>
@@ -504,7 +505,7 @@ findBackups(const QString & filePath)
         ret.append(filePath);
     }
     // find files matching filePath.~[0-9]+~
-    QRegExp rx(QString::fromUtf8("\\.~(\\d+)~$"));
+    QRegularExpression rx(QString::fromUtf8("\\.~(\\d+)~$"));
     QFileInfo fileInfo(filePath);
     QString fileName = fileInfo.fileName();
     QDirIterator it(fileInfo.dir());
@@ -518,7 +519,10 @@ findBackups(const QString & filePath)
 
         // If the filename contains target string - put it in the hitlist
         QString fn = file.fileName();
-        if (fn.startsWith(fileName) && rx.lastIndexIn(fn) == fileName.size()) {
+        // QRegExp::lastIndexIn(fn) returned the start of the last match; the pattern is anchored
+        // at the end ($), so the (single possible) match start is what we compare.
+        QRegularExpressionMatch backupMatch = rx.match(fn);
+        if (fn.startsWith(fileName) && backupMatch.hasMatch() && backupMatch.capturedStart(0) == fileName.size()) {
             ret.append(file.filePath());
         }
     }
@@ -532,10 +536,11 @@ findBackups(const QString & filePath)
 static QString
 nextBackup(const QString & filePath)
 {
-    QRegExp rx(QString::fromUtf8("\\.~(\\d+)~$"));
-    int pos = rx.lastIndexIn(filePath);
-    if (pos >= 0) {
-        int i = rx.cap(1).toInt();
+    QRegularExpression rx(QString::fromUtf8("\\.~(\\d+)~$"));
+    QRegularExpressionMatch m = rx.match(filePath);
+    if (m.hasMatch()) {
+        int pos = m.capturedStart(0);
+        int i = m.captured(1).toInt();
         return filePath.left(pos) + QString::fromUtf8(".~%1~").arg(i+1);
     } else {
         return filePath + QString::fromUtf8(".~1~");
@@ -756,7 +761,8 @@ Project::onAutoSaveTimerTriggered()
     if (canAutoSave) {
         std::shared_ptr<QFutureWatcher<void> > watcher = std::make_shared<QFutureWatcher<void> >();
         QObject::connect( watcher.get(), SIGNAL(finished()), this, SLOT(onAutoSaveFutureFinished()) );
-        watcher->setFuture( QtConcurrent::run(this, &Project::autoSave) );
+        // Qt6 removed QtConcurrent::run(object, &Class::method): use a lambda (works in Qt5 and Qt6).
+        watcher->setFuture( QtConcurrent::run([this]() { this->autoSave(); }) );
         _imp->autoSaveFutures.push_back(watcher);
     } else {
         ///If the auto-save failed because a render is in progress, try every 2 seconds to auto-save.

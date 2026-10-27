@@ -61,7 +61,9 @@ class QNetworkRequest;
 class QProcess;
 class QSettings;
 class QString;
-class QStringList;
+// QStringList is a typedef of QList<QString> in Qt6, so it cannot be forward-declared as a class.
+// qcontainerfwd.h declares it correctly for both Qt5 and Qt6.
+#include <QtCore/qcontainerfwd.h>
 class QThread;
 class QTimer;
 class QUrl;

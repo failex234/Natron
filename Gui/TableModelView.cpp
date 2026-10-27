@@ -925,8 +925,13 @@ ExpandingLineEdit::updateMinimumWidth()
     QStyleOptionFrame opt;
     initStyleOption(&opt);
 
-    int minWidth = style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(width, 0).
-                                             expandedTo( QApplication::globalStrut() ), this).width();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // QApplication::globalStrut() was removed in Qt6 (it was a no-op (0,0) by default)
+    const QSize contentSize(width, 0);
+#else
+    const QSize contentSize = QSize(width, 0).expandedTo( QApplication::globalStrut() );
+#endif
+    int minWidth = style()->sizeFromContents(QStyle::CT_LineEdit, &opt, contentSize, this).width();
     setMinimumWidth(minWidth);
 }
 

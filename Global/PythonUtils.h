@@ -65,6 +65,21 @@ PyObject* initializePython3(const std::vector<wchar_t*>& commandLineArgsWide);
 
 std::string PyStringToStdString(PyObject* obj);
 
+#if PY_VERSION_HEX >= 0x030F0000
+/**
+ * @brief Adapter for modules that only provide a PyModExport_<name> hook (what Shiboken >= 6.12 generates
+ * for Python >= 3.15) but must be registered with PyImport_AppendInittab(), which only accepts
+ * PyInit_<name>-style functions.
+ * Call it from a PyInit-style function: it runs the export hook and builds a regular multi-phase
+ * PyModuleDef (stored in @p def / @p slotStorage, which must be static) from the returned slots.
+ **/
+PyObject* moduleFromExportHook(PySlot* (*exportHook)(void),
+                               const char* name,
+                               PyModuleDef* def,
+                               PyModuleDef_Slot* slotStorage,
+                               size_t slotStorageSize);
+#endif
+
 NATRON_PYTHON_NAMESPACE_EXIT
 
 NATRON_NAMESPACE_EXIT

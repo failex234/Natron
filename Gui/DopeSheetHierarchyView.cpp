@@ -798,7 +798,13 @@ HierarchyView::drawRow(QPainter *painter,
         painter->fillRect(itemRect.adjusted(-1, 0, 0, 0), fillColor);
 
         // Draw the item text
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        // QAbstractItemView::viewOptions() was removed in Qt6, initViewItemOption() replaces it
+        QStyleOptionViewItem newOpt;
+        initViewItemOption(&newOpt);
+#else
         QStyleOptionViewItem newOpt = viewOptions();
+#endif
 
         newOpt.rect = itemRect;
 
@@ -849,7 +855,12 @@ HierarchyView::drawBranches(QPainter *painter,
         painter->fillRect(rectForDull, nodeColorDull);
 
         // Draw the branch indicator
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QStyleOptionViewItem option;
+        initViewItemOption(&option);
+#else
         QStyleOptionViewItem option = viewOptions();
+#endif
 
         option.rect = _imp->getParentArrowRect(item, rect);
         option.displayAlignment = Qt::AlignCenter;

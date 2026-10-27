@@ -946,7 +946,11 @@ GuiApplicationManager::initGui(const CLArgs& args)
     QObject::connect( &_imp->updateSplashscreenTimer, SIGNAL(timeout()), this, SLOT(onFontconfigTimerTriggered()) );
     _imp->updateSplashscreenTimer.start(1000);
 
-    _imp->fontconfigUpdateWatcher->setFuture( QtConcurrent::run(_imp.get(), &GuiApplicationManagerPrivate::updateFontConfigCache) );
+    {
+        // Qt6 removed QtConcurrent::run(object, &Class::method): use a lambda (works in Qt5 and Qt6).
+        GuiApplicationManagerPrivate* impPtr = _imp.get();
+        _imp->fontconfigUpdateWatcher->setFuture( QtConcurrent::run([impPtr]() { impPtr->updateFontConfigCache(); }) );
+    }
 
     Gui::loadStyleSheet();
 

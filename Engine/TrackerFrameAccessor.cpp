@@ -25,6 +25,12 @@
 
 #include "TrackerFrameAccessor.h"
 
+// Qt6 headers (qnumeric.h) use "V2" as a template parameter name, but libmv/logging/logging.h
+// defines a macro V2: include the Qt headers that pull in qnumeric.h before libmv.
+#include <QtCore/qglobal.h>
+#include <QtCore/qnumeric.h>
+#include <QDebug>
+
 // clang-format off
 GCC_DIAG_OFF(unused-function)
 GCC_DIAG_OFF(unused-parameter)

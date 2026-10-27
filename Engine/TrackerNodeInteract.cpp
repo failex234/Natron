@@ -1099,7 +1099,13 @@ TrackerNodeInteract::refreshSelectedMarkerTexture()
 
     imageGetterWatcher = std::make_shared<TrackWatcher>();
     QObject::connect( imageGetterWatcher.get(), SIGNAL(finished()), this, SLOT(onTrackImageRenderingFinished()) );
-    imageGetterWatcher->setFuture( QtConcurrent::run(marker.get(), &TrackMarker::getMarkerImage, time, roi) );
+    // Qt6 removed QtConcurrent::run(object, &Class::method, args...): use a lambda (works in Qt5 and Qt6).
+    {
+        TrackMarker* markerPtr = marker.get();
+        imageGetterWatcher->setFuture( QtConcurrent::run([markerPtr, time, roi]() {
+            return markerPtr->getMarkerImage(time, roi);
+        }) );
+    }
 }
 
 void
@@ -1130,7 +1136,13 @@ TrackerNodeInteract::makeMarkerKeyTexture(int time,
         TrackWatcherPtr watcher( new TrackWatcher() );
         QObject::connect( watcher.get(), SIGNAL(finished()), this, SLOT(onKeyFrameImageRenderingFinished()) );
         trackRequestsMap[k] = watcher;
-        watcher->setFuture( QtConcurrent::run(track.get(), &TrackMarker::getMarkerImage, time, k.roi) );
+        {
+            TrackMarker* trackPtr = track.get();
+            const RectI keyRoi = k.roi;
+            watcher->setFuture( QtConcurrent::run([trackPtr, time, keyRoi]() {
+                return trackPtr->getMarkerImage(time, keyRoi);
+            }) );
+        }
     }
 }
 

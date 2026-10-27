@@ -75,6 +75,21 @@ if(NATRON_QT6)
     set(QT_VERSION_MAJOR 6)
     set(PYSIDE_VERSION_MAJOR 6)
 
+    if(APPLE)
+        # Qt from Homebrew/the Qt installer is a set of frameworks. The forwarding headers in
+        # <prefix>/include/QtCore use #include_next <QtCore/...> and only resolve through a
+        # framework search path, otherwise shiboken ends in "#include nested too deeply".
+        get_filename_component(NATRON_QT_FRAMEWORK_DIR "${Qt6_DIR}/../.." ABSOLUTE)
+        set(SHIBOKEN_EXTRA_ARGS "--framework-include-paths=${NATRON_QT_FRAMEWORK_DIR}")
+    endif()
+
+    # Shiboken6 exports Py_LIMITED_API (abi3) to everything linking libshiboken. Natron's
+    # typesystems and the embedding code use the full C API (PyTuple_SET_ITEM, PyList_GET_ITEM,
+    # PyRun_String, ...), which is not available under the limited API.
+    get_property(NATRON_SHIBOKEN_DEFS TARGET Shiboken6::libshiboken PROPERTY INTERFACE_COMPILE_DEFINITIONS)
+    list(FILTER NATRON_SHIBOKEN_DEFS EXCLUDE REGEX "^Py_LIMITED_API")
+    set_property(TARGET Shiboken6::libshiboken PROPERTY INTERFACE_COMPILE_DEFINITIONS "${NATRON_SHIBOKEN_DEFS}")
+
     get_target_property(PYSIDE_INCLUDE_DIRS PySide6::pyside6 INTERFACE_INCLUDE_DIRECTORIES)
     set(QTCORE_INCLUDE_DIRS ${Qt6Core_INCLUDE_DIRS})
     set(QTGUI_INCLUDE_DIRS ${Qt6Gui_INCLUDE_DIRS})

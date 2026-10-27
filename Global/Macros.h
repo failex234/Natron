@@ -191,7 +191,10 @@ namespace Python { }
 #endif
 
 ///For example RC 1, RC 2 etc... This is to be defined from within the qmake call, passing BUILD_NUMBER=X to the command line
-//#define NATRON_BUILD_NUMBER 0
+// Fallback: tools that only parse the headers (e.g. shiboken) do not see the build system's DEFINES.
+#ifndef NATRON_BUILD_NUMBER
+#define NATRON_BUILD_NUMBER 0
+#endif
 
 
 // Documentation

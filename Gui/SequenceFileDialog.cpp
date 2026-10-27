@@ -238,7 +238,11 @@ SequenceFileDialog::SequenceFileDialog( QWidget* parent, // necessary to transmi
     _lookInCombobox = new FileDialogComboBox(this, _buttonsWidget);
     _lookInCombobox->setMinimumWidth(200);
     _buttonsLayout->addWidget(_lookInCombobox);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QObject::connect( _lookInCombobox, SIGNAL(textActivated(QString)), this, SLOT(onLookingComboboxChanged(QString)) );
+#else
     QObject::connect( _lookInCombobox, SIGNAL(activated(QString)), this, SLOT(onLookingComboboxChanged(QString)) );
+#endif
     _lookInCombobox->setInsertPolicy(QComboBox::NoInsert);
     _lookInCombobox->setDuplicatesEnabled(false);
 
@@ -783,13 +787,13 @@ SequenceFileDialog::createMenuActions()
 {
     QAction *goHomeAction =  new QAction(this);
 
-    goHomeAction->setShortcut(Qt::CTRL + Qt::Key_H + Qt::SHIFT);
+    goHomeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H | Qt::SHIFT));
     QObject::connect( goHomeAction, SIGNAL(triggered()), this, SLOT(goHome()) );
     addAction(goHomeAction);
 
 
     QAction *goToParent =  new QAction(this);
-    goToParent->setShortcut(Qt::CTRL + Qt::UpArrow);
+    goToParent->setShortcut(QKeySequence(Qt::CTRL | Qt::UpArrow));
     QObject::connect( goToParent, SIGNAL(triggered()), this, SLOT(parentFolder()) );
     addAction(goToParent);
 

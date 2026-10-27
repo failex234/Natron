@@ -22,6 +22,11 @@
     <!--Load QtCore typesystem-->
     <load-typesystem name="typesystem_core.xml" generate="no" />
     
+    <!--Python builtin types used as modified-type in the Natron typesystems.
+        Shiboken2 knew these, Shiboken6 requires them to be declared.-->
+    <custom-type name="PyList" check-function="PyList_Check"/>
+    <custom-type name="PyTuple" check-function="PyTuple_Check"/>
+
     <!--Primitives-->
     <primitive-type name="bool"/>
     <primitive-type name="double"/>

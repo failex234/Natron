@@ -258,12 +258,26 @@ PyObject* initializePython3(const std::vector<wchar_t*>& commandLineArgsWide)
 
     // Py_SetPath clears sys.prefix and sys.exec_prefix
     // https://github.com/NatronGitHub/Natron/issues/696
+#if PY_VERSION_HEX >= 0x030E0000
+    // Py_GetPythonHome() was removed in Python 3.15, PyConfig_Get() exists since 3.14.
+    {
+        PyObject *home = PyConfig_Get("home"); // new reference, None if unset
+        if (home && home != Py_None) {
+            PySys_SetObject(const_cast<char*>("prefix"), home);
+            PySys_SetObject(const_cast<char*>("exec_prefix"), home);
+        } else {
+            PyErr_Clear();
+        }
+        Py_XDECREF(home);
+    }
+#else
     PyObject *prefix = PyUnicode_FromWideChar(Py_GetPythonHome(), -1);
     PySys_SetObject(const_cast<char*>("prefix"), prefix);
     Py_XDECREF(prefix);
     PyObject *exec_prefix = PyUnicode_FromWideChar(Py_GetPythonHome(), -1);
     PySys_SetObject(const_cast<char*>("exec_prefix"), exec_prefix);
     Py_XDECREF(exec_prefix);
+#endif
 
     /////////////////////////////////////////
     // PySys_SetArgv
@@ -311,12 +325,15 @@ PyObject* initializePython3(const std::vector<wchar_t*>& commandLineArgsWide)
         printf( "Py_IgnoreEnvironmentFlag is %d\n", Py_IgnoreEnvironmentFlag );
         printf( "Py_DontWriteBytecodeFlag is %d\n", Py_DontWriteBytecodeFlag );
         printf( "Py_NoUserSiteDirectory is %d\n", Py_NoUserSiteDirectory );
+#if PY_VERSION_HEX < 0x030F0000
+        // These getters were removed in Python 3.15 (the values are visible in sys.* below).
         printf( "Py_GetProgramName is %ls\n", Py_GetProgramName() );
         printf( "Py_GetPrefix is %ls\n", Py_GetPrefix() );
         printf( "Py_GetExecPrefix is %ls\n", Py_GetPrefix() );
         printf( "Py_GetProgramFullPath is %ls\n", Py_GetProgramFullPath() );
         printf( "Py_GetPath is %ls\n", Py_GetPath() );
         printf( "Py_GetPythonHome is %ls\n", Py_GetPythonHome() );
+#endif
 
 #define DUMP_SYS(NAME) \
             do { \
@@ -404,6 +421,60 @@ PyStringToStdString(PyObject* py_val)
 
     return val;
 }
+
+#if PY_VERSION_HEX >= 0x030F0000
+PyObject*
+moduleFromExportHook(PySlot* (*exportHook)(void),
+                     const char* name,
+                     PyModuleDef* def,
+                     PyModuleDef_Slot* slotStorage,
+                     size_t slotStorageSize)
+{
+    if (def->m_slots) {
+        // already built by a previous call: the same definition is reused
+        return PyModuleDef_Init(def);
+    }
+
+    const PySlot* slots = exportHook(); // also runs the module's one-time initialization
+    if (!slots) {
+        return NULL; // the hook has set an exception
+    }
+
+    PyModuleDef tmpl = { PyModuleDef_HEAD_INIT, name, NULL, 0, NULL, NULL, NULL, NULL, NULL };
+    *def = tmpl;
+
+    size_t n = 0;
+    for (const PySlot* s = slots; s->sl_id != 0; ++s) {
+        switch (s->sl_id) {
+        case Py_mod_methods:
+            def->m_methods = static_cast<PyMethodDef*>(s->sl_ptr);
+            break;
+        case Py_mod_doc:
+            def->m_doc = static_cast<const char*>(s->sl_ptr);
+            break;
+        case Py_mod_exec:
+        case Py_mod_multiple_interpreters:
+        case Py_mod_gil:
+            if (n + 1 >= slotStorageSize) { // keep room for the terminator
+                PyErr_SetString(PyExc_SystemError, "too many module slots");
+                return NULL;
+            }
+            slotStorage[n].slot = s->sl_id;
+            slotStorage[n].value = s->sl_ptr;
+            ++n;
+            break;
+        default:
+            // Py_mod_abi and Py_mod_name are implied by the PyModuleDef itself.
+            break;
+        }
+    }
+    slotStorage[n].slot = 0;
+    slotStorage[n].value = NULL;
+    def->m_slots = slotStorage;
+
+    return PyModuleDef_Init(def);
+}
+#endif // PY_VERSION_HEX >= 0x030F0000
 
 NATRON_PYTHON_NAMESPACE_EXIT
 

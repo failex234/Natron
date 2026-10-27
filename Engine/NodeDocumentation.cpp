@@ -27,6 +27,7 @@
 
 #include <QTextStream>
 #include <QFile>
+#include <QRegularExpression>
 
 #include "Engine/EffectInstance.h"
 #include "Engine/KnobTypes.h"
@@ -409,7 +410,8 @@ Node::makeDocumentation(bool genHTML) const
             pluginDescription = NATRON_NAMESPACE::convertFromPlainText(pluginDescription, NATRON_NAMESPACE::WhiteSpaceNormal);
 
             // replace URLs with links
-            QRegExp re( QString::fromUtf8("((http|ftp|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?)") );
+            // QString::replace(QRegularExpression, ...) supports \1 back-references like QRegExp did.
+            QRegularExpression re( QString::fromUtf8("((http|ftp|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?)") );
             pluginDescription.replace( re, QString::fromUtf8("<a href=\"\\1\">\\1</a>") );
         } else {
             pluginDescription = convertFromPlainTextToMarkdown(pluginDescription, genHTML, false);

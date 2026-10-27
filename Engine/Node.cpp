@@ -42,7 +42,7 @@
 #include <QWaitCondition>
 #include <QTextStream>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <ofxNatron.h>
 

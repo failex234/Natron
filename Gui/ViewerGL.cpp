@@ -43,6 +43,7 @@
 GCC_DIAG_UNUSED_PRIVATE_FIELD_OFF
 // /opt/local/include/QtGui/qmime.h:119:10: warning: private field 'type' is not used [-Wunused-private-field]
 #include <QKeyEvent>
+#include <QRegularExpression>
 #include <QMouseEvent>
 GCC_DIAG_UNUSED_PRIVATE_FIELD_ON
 #include <QTreeWidget>
@@ -1069,7 +1070,7 @@ NATRON_NAMESPACE_ANONYMOUS_ENTER
 static QStringList
 explode(const QString& str)
 {
-    QRegExp rx( QString::fromUtf8("(\\ |\\-|\\.|\\/|\\t|\\n)") ); //RegEx for ' ' '/' '.' '-' '\t' '\n'
+    QRegularExpression rx( QString::fromUtf8("(\\ |\\-|\\.|\\/|\\t|\\n)") ); //RegEx for ' ' '/' '.' '-' '\t' '\n'
     QStringList ret;
     int startIndex = 0;
 
@@ -2075,6 +2076,21 @@ ViewerGL::tabletEvent(QTabletEvent* e)
     }
     switch ( e->type() ) {
     case QEvent::TabletPress: {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        // QTabletEvent::pointerType() returns QPointingDevice::PointerType in Qt6
+        switch ( e->pointerType() ) {
+        case QPointingDevice::PointerType::Cursor:
+            _imp->pointerTypeOnPress  = ePenTypeCursor;
+            break;
+        case QPointingDevice::PointerType::Eraser:
+            _imp->pointerTypeOnPress  = ePenTypeEraser;
+            break;
+        case QPointingDevice::PointerType::Pen:
+        default:
+            _imp->pointerTypeOnPress  = ePenTypePen;
+            break;
+        }
+#else
         switch ( e->pointerType() ) {
         case QTabletEvent::Cursor:
             _imp->pointerTypeOnPress  = ePenTypeCursor;
@@ -2087,6 +2103,7 @@ ViewerGL::tabletEvent(QTabletEvent* e)
             _imp->pointerTypeOnPress  = ePenTypePen;
             break;
         }
+#endif
         _imp->pressureOnPress = pressure;
         QOpenGLWidget::tabletEvent(e);
         break;

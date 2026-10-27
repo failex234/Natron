@@ -448,7 +448,7 @@ ScaleSliderQWidget::paintEvent(QPaintEvent* /*e*/)
 
     ///fill the background with the appropriate style color
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this); // QStyleOption::init() was removed in Qt6, initFrom() exists in Qt5 too
     QPainter p(this);
     p.setOpacity(1);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);

@@ -112,7 +112,7 @@ SplashScreen::paintEvent(QPaintEvent*)
 {
     QStyleOption opt;
 
-    opt.init(this);
+    opt.initFrom(this); // QStyleOption::init() was removed in Qt6, initFrom() exists in Qt5 too
     QPainter p(this);
 
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
@@ -165,7 +165,7 @@ LoadProjectSplashScreen::paintEvent(QPaintEvent* /*e*/)
 {
     QStyleOption opt;
 
-    opt.init(this);
+    opt.initFrom(this); // QStyleOption::init() was removed in Qt6, initFrom() exists in Qt5 too
     QPainter p(this);
 
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);

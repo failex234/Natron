@@ -36,6 +36,7 @@ CLANG_DIAG_OFF(uninitialized)
 
 #include <QApplication>
 #include <QKeyEvent>
+#include <QRegularExpression>
 #include <QDesktopServices>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -819,7 +820,10 @@ PreferencesPanel::filterPlugins(const QString & txt)
             pattern.push_back(txt[i]);
         }
         pattern.push_back( QLatin1Char('*') );
-        QRegExp expr(pattern, Qt::CaseInsensitive, QRegExp::WildcardUnix);
+        // The pattern starts and ends with '*', so the anchored regexp returned by
+        // wildcardToRegularExpression() behaves like QRegExp::WildcardUnix + contains().
+        QRegularExpression expr( QRegularExpression::wildcardToRegularExpression(pattern),
+                                 QRegularExpression::CaseInsensitiveOption );
         std::list<QTreeWidgetItem*> itemsToDisplay;
         for (PluginTreeNodeList::iterator it = _imp->pluginsList.begin(); it != _imp->pluginsList.end(); ++it) {
             if ( it->plugin && it->plugin->getLabelWithoutSuffix().contains(expr) ) {

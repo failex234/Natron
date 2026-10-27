@@ -32,7 +32,7 @@ set(PYENGINE_HEADER PySide${PYSIDE_VERSION_MAJOR}_Engine_Python.h)
 
 set(shiboken_args
     "-std=c++17" "--enable-parent-ctor-heuristic" "--use-isnull-as-nb_nonzero"
-    "--avoid-protected-hack" "--enable-pyside-extensions"
+    "--avoid-protected-hack" "--enable-pyside-extensions" ${SHIBOKEN_EXTRA_ARGS}
     "-I." "-I.." "-I../Global" "-I../libs/OpenFX/include" ${PYENGINE_INCS}
     "-T${PYSIDE_TYPESYSTEMS}" "--output-directory=${PYENGINE_OUT}"
     "${PYENGINE_HEADER}" "typesystem_engine.xml")

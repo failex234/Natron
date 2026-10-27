@@ -25,6 +25,15 @@
 #include <QString>
 #include <QUrl>
 #include <QFileInfo>
+#include <QEvent>
+#include <QMutex>
+#include <QMutexLocker>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+// QEnterEvent lives in QtGui, which not every module (e.g. Engine) links against:
+// a forward declaration is enough for the pointer typedef below.
+class QEnterEvent;
+#endif
 
 NATRON_NAMESPACE_ENTER
 
@@ -48,9 +57,14 @@ removeFileExtension(QString & filename)
 
 // Define compatibility typedefs so code builds with Qt5 & Qt6
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-typedef QEnterEvent QEnterEvent;
+typedef ::QEnterEvent QEnterEvent;
+// QMutexLocker is a class template in Qt6 (QMutexLocker<QMutex>), a plain class in Qt5.
+typedef ::QMutexLocker<::QMutex> MutexLocker;
+typedef ::QMutexLocker<::QRecursiveMutex> RecursiveMutexLocker;
 #elif QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 typedef QEvent QEnterEvent;
+typedef ::QMutexLocker MutexLocker;
+typedef ::QMutexLocker RecursiveMutexLocker; // Qt >= 5.14 accepts QRecursiveMutex*
 #else
 #error "Unsupported version of QT"
 #endif

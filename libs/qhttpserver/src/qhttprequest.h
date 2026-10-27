@@ -46,7 +46,9 @@ class QHTTPSERVER_API QHttpRequest : public QObject
     Q_PROPERTY(HeaderHash headers READ headers)
     Q_PROPERTY(QString remoteAddress READ remoteAddress)
     Q_PROPERTY(quint16 remotePort READ remotePort)
-    Q_PROPERTY(QString method READ method)
+    // Qt6's moc requires the READ function to return the declared property type
+    // (method() returns the HttpMethod enum, methodString() returns a QString).
+    Q_PROPERTY(QString method READ methodString)
     Q_PROPERTY(QUrl url READ url)
     Q_PROPERTY(QString path READ path)
     Q_PROPERTY(QString httpVersion READ httpVersion)
