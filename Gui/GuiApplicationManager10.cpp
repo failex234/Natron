@@ -47,9 +47,9 @@ CLANG_DIAG_OFF(uninitialized)
 CLANG_DIAG_ON(deprecated)
 CLANG_DIAG_ON(uninitialized)
 
+#include "Global/PythonUtils.h" // moduleFromExportHook (Python >= 3.15), also needed in release builds
 #ifdef DEBUG
 #include "Global/FloatingPointExceptions.h"
-#include "Global/PythonUtils.h"
 #endif
 
 #include "Engine/LibraryBinary.h"
