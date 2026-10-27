@@ -81,6 +81,27 @@ if(NATRON_QT6)
         # framework search path, otherwise shiboken ends in "#include nested too deeply".
         get_filename_component(NATRON_QT_FRAMEWORK_DIR "${Qt6_DIR}/../.." ABSOLUTE)
         set(SHIBOKEN_EXTRA_ARGS "--framework-include-paths=${NATRON_QT_FRAMEWORK_DIR}")
+
+        # Point the Qt targets at the real framework headers instead of those forwarding headers.
+        # The compiler copes with them, but IDE code models (CLion) do not and report Qt types
+        # as incomplete.
+        foreach(_qt_module ${QT_COMPONENTS} OpenGL)
+            if(NOT TARGET Qt6::${_qt_module})
+                continue()
+            endif()
+            get_target_property(_qt_dirs Qt6::${_qt_module} INTERFACE_INCLUDE_DIRECTORIES)
+            set(_qt_new_dirs)
+            foreach(_dir ${_qt_dirs})
+                if(_dir MATCHES "/include/(Qt[A-Za-z]+)$")
+                    set(_qt_headers "${NATRON_QT_FRAMEWORK_DIR}/${CMAKE_MATCH_1}.framework/Headers")
+                    if(IS_DIRECTORY "${_qt_headers}")
+                        set(_dir "${_qt_headers}")
+                    endif()
+                endif()
+                list(APPEND _qt_new_dirs "${_dir}")
+            endforeach()
+            set_property(TARGET Qt6::${_qt_module} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${_qt_new_dirs}")
+        endforeach()
     endif()
 
     # Shiboken6 exports Py_LIMITED_API (abi3) to everything linking libshiboken. Natron's
