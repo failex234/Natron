@@ -83,7 +83,9 @@ if(NATRON_BUNDLE_RUNTIME)
                 GIT_REPOSITORY "${NATRON_RUNTIME_GIT_URL}/${_plugin}.git"
                 GIT_TAG master
                 GIT_SHALLOW ON
-                GIT_SUBMODULES_RECURSE ON)
+                GIT_SUBMODULES_RECURSE ON
+                # don't fetch on every build; build the <plugin>-update target to update
+                UPDATE_DISCONNECTED ON)
         endif()
         ExternalProject_Add(${_plugin}
             ${_source}
