@@ -107,6 +107,20 @@ if(NATRON_QT6)
             endforeach()
             set_property(TARGET Qt6::${_qt_module} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${_qt_new_dirs}")
         endforeach()
+        # Qt headers include each other as <QtCore/...>. Other dependencies (Boost, cairo) add
+        # -isystem <prefix>/include, where those resolve to the forwarding headers again, and
+        # clang searches -iframework paths only after all -isystem paths. Provide <QtX/...> from
+        # a directory of symlinks to the framework headers and search it first in every target.
+        set(_qt_headers_dir "${CMAKE_BINARY_DIR}/qt-framework-headers")
+        file(GLOB _qt_frameworks LIST_DIRECTORIES true "${NATRON_QT_FRAMEWORK_DIR}/Qt*.framework")
+        foreach(_fw ${_qt_frameworks})
+            get_filename_component(_qt_module "${_fw}" NAME_WE)
+            if(IS_DIRECTORY "${_fw}/Headers" AND NOT EXISTS "${_qt_headers_dir}/${_qt_module}")
+                file(MAKE_DIRECTORY "${_qt_headers_dir}")
+                file(CREATE_LINK "${_fw}/Headers" "${_qt_headers_dir}/${_qt_module}" SYMBOLIC)
+            endif()
+        endforeach()
+        include_directories(BEFORE SYSTEM "${_qt_headers_dir}")
     endif()
 
     # Shiboken6 exports Py_LIMITED_API (abi3) to everything linking libshiboken. Natron's
