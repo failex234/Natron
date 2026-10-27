@@ -9,7 +9,8 @@
       "binaryDir": "${sourceDir}/cmake-build-${presetName}",
       "cacheVariables": {
         "NATRON_QT6": "ON",
-        "NATRON_BUILD_TESTS": "OFF"
+        "NATRON_BUILD_TESTS": "OFF",
+        "NATRON_BUNDLE_RUNTIME": "ON"
       }
     },
     {

@@ -33,6 +33,11 @@ include(GNUInstallDirs)
 option(NATRON_QT6 "use Qt6" OFF)
 option(NATRON_SYSTEM_LIBS "use system versions of dependencies instead of bundled ones" OFF)
 option(NATRON_BUILD_TESTS "build the Natron test suite" ON)
+option(NATRON_BUNDLE_RUNTIME "also build the OpenFX plug-ins and fetch the OpenColorIO configs, so that the built Natron runs as is" OFF)
+set(NATRON_RUNTIME_GIT_URL "https://github.com/failex234" CACHE STRING
+    "GitHub URL of the owner of the plug-in and OpenColorIO-Configs repositories (NATRON_BUNDLE_RUNTIME)")
+set(NATRON_OFX_PLUGINS "openfx-io;openfx-misc" CACHE STRING "OpenFX plug-in repositories to build (NATRON_BUNDLE_RUNTIME)")
+set(NATRON_OCIO_CONFIGS_VERSION "2.5" CACHE STRING "OpenColorIO-Configs tag Natron-v<version> to fetch (NATRON_BUNDLE_RUNTIME)")
 
 set(IS_DEBUG_BUILD OFF)
 if(CMAKE_BUILD_TYPE MATCHES "^(debug|Debug|DEBUG)$")

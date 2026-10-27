@@ -48,6 +48,68 @@ target_include_directories(Natron
         ../Global
 )
 
+if(NATRON_BUNDLE_RUNTIME)
+    include(ExternalProject)
+
+    # Natron loads bundled plug-ins from <bindir>/../Plugins/OFX/Natron (Engine/OfxHost.cpp) and
+    # the OpenColorIO configs from <bindir>/../Resources (../share on Linux, Engine/Settings.cpp).
+    if(APPLE)
+        set(NATRON_RUNTIME_ROOT "${CMAKE_CURRENT_BINARY_DIR}/Natron.app/Contents")
+        set(NATRON_OCIO_CONFIGS_DIR "${NATRON_RUNTIME_ROOT}/Resources/OpenColorIO-Configs")
+    else()
+        set(NATRON_RUNTIME_ROOT "${CMAKE_BINARY_DIR}")
+        if(WIN32)
+            set(NATRON_OCIO_CONFIGS_DIR "${NATRON_RUNTIME_ROOT}/Resources/OpenColorIO-Configs")
+        else()
+            set(NATRON_OCIO_CONFIGS_DIR "${NATRON_RUNTIME_ROOT}/share/OpenColorIO-Configs")
+        endif()
+    endif()
+    set(NATRON_PLUGINS_DIR "${NATRON_RUNTIME_ROOT}/Plugins/OFX/Natron")
+
+    # CMAKE_PREFIX_PATH is a list: pass it through with another separator
+    string(REPLACE ";" "|" _prefix_path "${CMAKE_PREFIX_PATH}")
+
+    set(_runtime_targets)
+    foreach(_plugin ${NATRON_OFX_PLUGINS})
+        string(TOUPPER "${_plugin}" _var)
+        string(REPLACE "-" "_" _var "${_var}")
+        set(NATRON_${_var}_SOURCE_DIR "" CACHE PATH
+            "Local checkout of ${_plugin} to build instead of cloning it from NATRON_RUNTIME_GIT_URL")
+        if(NATRON_${_var}_SOURCE_DIR)
+            # rebuild on every build so that local changes are picked up (ninja keeps it incremental)
+            set(_source SOURCE_DIR "${NATRON_${_var}_SOURCE_DIR}" BUILD_ALWAYS ON)
+        else()
+            set(_source
+                GIT_REPOSITORY "${NATRON_RUNTIME_GIT_URL}/${_plugin}.git"
+                GIT_TAG master
+                GIT_SHALLOW ON
+                GIT_SUBMODULES_RECURSE ON)
+        endif()
+        ExternalProject_Add(${_plugin}
+            ${_source}
+            LIST_SEPARATOR |
+            CMAKE_ARGS
+                "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+                "-DCMAKE_PREFIX_PATH=${_prefix_path}"
+                "-DCMAKE_INSTALL_PREFIX=${NATRON_PLUGINS_DIR}"
+                "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+            USES_TERMINAL_BUILD ON)
+        list(APPEND _runtime_targets ${_plugin})
+    endforeach()
+
+    ExternalProject_Add(OpenColorIO-Configs
+        URL "${NATRON_RUNTIME_GIT_URL}/OpenColorIO-Configs/archive/Natron-v${NATRON_OCIO_CONFIGS_VERSION}.tar.gz"
+        TLS_VERIFY ON
+        DOWNLOAD_EXTRACT_TIMESTAMP ON
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND "${CMAKE_COMMAND}" -E copy_directory <SOURCE_DIR> "${NATRON_OCIO_CONFIGS_DIR}")
+    list(APPEND _runtime_targets OpenColorIO-Configs)
+
+    add_custom_target(natron-runtime DEPENDS ${_runtime_targets})
+    add_dependencies(Natron natron-runtime)
+endif()
+
 install(TARGETS Natron DESTINATION "${CMAKE_INSTALL_BINDIR}")
 install(FILES ../Gui/Resources/Applications/fr.natron.Natron.desktop
     DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
