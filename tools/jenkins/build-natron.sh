@@ -71,7 +71,7 @@ if [ "$OCIO_CONFIGS_VERSION" = "" ]; then
     echo "Warning: No OCIO config version found, setting to $OCIO_CONFIGS_VERSION"
 fi
 
-OCIO_CONFIGS_URL=https://github.com/NatronGitHub/OpenColorIO-Configs/archive/Natron-v${OCIO_CONFIGS_VERSION}.tar.gz
+OCIO_CONFIGS_URL=https://github.com/failex234/OpenColorIO-Configs/archive/Natron-v${OCIO_CONFIGS_VERSION}.tar.gz
 
 OCIO_CONFIGS_DIR="$SRC_PATH/OpenColorIO-Configs-Natron-v${OCIO_CONFIGS_VERSION}"
 if [ ! -d "$OCIO_CONFIGS_DIR" ]; then

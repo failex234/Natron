@@ -1,7 +1,7 @@
 # Natron-build dockerfile.
 
 FROM natrongithub/natron-sdk:latest as intermediate
-MAINTAINER https://github.com/NatronGitHub/Natron
+MAINTAINER https://github.com/failex234/Natron
 WORKDIR /home
 
 COPY *.sh ./
@@ -35,7 +35,7 @@ ARG QTDIR=$SDK/qt4
 # DEBUG_SCRIPTS: If set to 1, binaries from previous build with same options are not cleaned so that the scripts can continue the same compilation
 # EXTRA_PYTHON_MODULES_SCRIPT: Path to a python script that should install extra modules with pip or easy_install.
 
-ENV GIT_URL=https://github.com/NatronGitHub/Natron.git
+ENV GIT_URL=https://github.com/failex234/Natron.git
 ENV GIT_BRANCH=RB-2.4
 ENV GIT_COMMIT=
 ENV RELEASE_TAG= 
@@ -94,7 +94,7 @@ RUN \
 RUN rm -rf /home/tmp
 
 FROM centos:6
-MAINTAINER https://github.com/NatronGitHub/Natron
+MAINTAINER https://github.com/failex234/Natron
 WORKDIR /home
 COPY --from=intermediate /home /home
 CMD runUnitTests.sh

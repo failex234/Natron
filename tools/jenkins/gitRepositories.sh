@@ -20,11 +20,11 @@
 
 # List here the repositories
 GIT_URL_OPENFX_OPENCV_GITHUB=${GIT_URL_OPENFX_OPENCV_GITHUB:-https://github.com/NatronGitHub/openfx-opencv.git}
-GIT_URL_NATRON_GITHUB=${GIT_URL_NATRON_GITHUB:-https://github.com/NatronGitHub/Natron.git}
+GIT_URL_NATRON_GITHUB=${GIT_URL_NATRON_GITHUB:-https://github.com/failex234/Natron.git}
 GIT_URL_NATRON_GFORGE=${GIT_URL_NATRON_GFORGE:-git+ssh://natron-ci@scm.gforge.inria.fr/gitroot/natron/natron.git}
-GIT_URL_OPENFX_IO_GITHUB=${GIT_URL_OPENFX_IO_GITHUB:-https://github.com/NatronGitHub/openfx-io.git}
-GIT_URL_OPENFX_MISC_GITHUB=${GIT_URL_OPENFX_MISC_GITHUB:-https://github.com/NatronGitHub/openfx-misc.git}
-GIT_URL_OPENFX_ARENA_GITHUB=${GIT_URL_OPENFX_ARENA_GITHUB:-https://github.com/NatronGitHub/openfx-arena.git}
+GIT_URL_OPENFX_IO_GITHUB=${GIT_URL_OPENFX_IO_GITHUB:-https://github.com/failex234/openfx-io.git}
+GIT_URL_OPENFX_MISC_GITHUB=${GIT_URL_OPENFX_MISC_GITHUB:-https://github.com/failex234/openfx-misc.git}
+GIT_URL_OPENFX_ARENA_GITHUB=${GIT_URL_OPENFX_ARENA_GITHUB:-https://github.com/failex234/openfx-arena.git}
 GIT_URL_OPENFX_GMIC_GITHUB=${GIT_URL_OPENFX_GMIC_GITHUB:-https://github.com/NatronGitHub/openfx-gmic.git}
 GIT_URL_NATRON_TESTS_GITHUB=${GIT_URL_NATRON_TESTS_GITHUB:-https://github.com/NatronGitHub/Natron-Tests.git}
 

@@ -61,7 +61,7 @@ jobs:
 
       - name: Download OpenColorIO-Configs
         run: |
-          wget https://github.com/NatronGitHub/OpenColorIO-Configs/archive/Natron-v${OCIO_CONFIG_VERSION}.tar.gz
+          wget https://github.com/failex234/OpenColorIO-Configs/archive/Natron-v${OCIO_CONFIG_VERSION}.tar.gz
           tar xzf Natron-v${OCIO_CONFIG_VERSION}.tar.gz
           mv OpenColorIO-Configs-Natron-v${OCIO_CONFIG_VERSION} OpenColorIO-Configs
 
@@ -147,7 +147,7 @@ jobs:
 
       - name: Download OpenColorIO-Configs
         run: |
-          wget https://github.com/NatronGitHub/OpenColorIO-Configs/archive/Natron-v${OCIO_CONFIG_VERSION}.tar.gz
+          wget https://github.com/failex234/OpenColorIO-Configs/archive/Natron-v${OCIO_CONFIG_VERSION}.tar.gz
           tar xzf Natron-v${OCIO_CONFIG_VERSION}.tar.gz
           mv OpenColorIO-Configs-Natron-v${OCIO_CONFIG_VERSION} OpenColorIO-Configs
 

@@ -1,15 +1,15 @@
 [submodule "libs/OpenFX"]
 	path = libs/OpenFX
-	url = https://github.com/NatronGitHub/openfx.git
+	url = https://github.com/failex234/openfx.git
 [submodule "Tests/google-test"]
 	path = Tests/google-test
-	url = https://github.com/NatronGitHub/google-test.git
+	url = https://github.com/failex234/google-test.git
 [submodule "Tests/google-mock"]
 	path = Tests/google-mock
-	url = https://github.com/NatronGitHub/google-mock
+	url = https://github.com/failex234/google-mock
 [submodule "libs/SequenceParsing"]
 	path = libs/SequenceParsing
-	url = https://github.com/NatronGitHub/SequenceParsing
+	url = https://github.com/failex234/SequenceParsing
 [submodule "libs/google-breakpad"]
 	path = libs/google-breakpad
-	url = https://github.com/NatronGitHub/google-breakpad.git
+	url = https://github.com/failex234/google-breakpad.git
