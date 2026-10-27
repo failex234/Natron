@@ -1395,9 +1395,10 @@ FileSystemModel::onWatchedDirectoryChanged(const QString& directory)
     if ( !QDir(_imp->currentRootPath).exists() ) {
         ///The current directory has changed its name or was deleted.. just fallback the filesystem to the root-path
         setRootPath( QDir::rootPath() );
-    } else {
-        setRootPath(_imp->currentRootPath);
     }
+    // Otherwise do not call setRootPath(currentRootPath): it resets the whole model (the view briefly shows
+    // the top-level "/" item) and recreates the watcher, which may report a change again and loop forever.
+    // cleanAndRefreshItem() above already re-gathers the current directory and emits directoryLoaded.
 }
 
 void

@@ -826,7 +826,9 @@ NodeGui::removeSettingsPanel()
 void
 NodeGui::refreshSize()
 {
-    QRectF bbox = boundingRect();
+    // Use the unscaled, pen-less rect that resize() stored: boundingRect() includes the
+    // pen width and the item scale, so feeding it back into resize() makes the node grow.
+    QRectF bbox = _boundingBox->rect();
 
     QString& label = _nodeLabel;
     resize( bbox.width(), bbox.height(), false, !label.isEmpty() );
@@ -3139,7 +3141,8 @@ NodeGui::setNameItemHtml(const QString & name,
     _nameItem->adjustSize();
 
 
-    QRectF bbox = boundingRect();
+    // See refreshSize(): don't feed boundingRect() (pen + scale) back into resize()
+    QRectF bbox = _boundingBox->rect();
     resize( bbox.width(), bbox.height(), false, !label.isEmpty() );
 } // setNameItemHtml
 
